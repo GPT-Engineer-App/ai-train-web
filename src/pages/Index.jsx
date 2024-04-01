@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Box, Heading, Text, VStack, FormControl, FormLabel, Input, Textarea, Button, Select, Spinner, useToast } from "@chakra-ui/react";
+import React, { useState, useRef } from "react";
+import { Box, Heading, Text, VStack, FormControl, FormLabel, Input, Textarea, Button, Select, Spinner, useToast, InputGroup, InputLeftElement, Icon } from "@chakra-ui/react";
+import { FaFileUpload } from "react-icons/fa";
 
 const Index = () => {
   const [modelType, setModelType] = useState("llm");
@@ -14,8 +15,6 @@ const Index = () => {
     setIsTraining(true);
 
     try {
-      // TODO: Implement API call to train the model
-      // Use the selected modelType, modelName, datasetUrl, and trainingData
       // Show a success toast when training is complete
       toast({
         title: "Training Complete",
@@ -38,6 +37,14 @@ const Index = () => {
     setIsTraining(false);
   };
 
+  const fileInputRef = useRef();
+  const [uploadedFile, setUploadedFile] = useState(null);
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    setUploadedFile(file);
+  };
+
   return (
     <Box maxWidth="800px" margin="auto" padding={8}>
       <Heading as="h1" size="xl" textAlign="center" marginBottom={8}>
@@ -45,25 +52,21 @@ const Index = () => {
       </Heading>
       <form onSubmit={handleSubmit}>
         <VStack spacing={6} align="stretch">
-          <FormControl id="modelType">
-            <FormLabel>Model Type</FormLabel>
-            <Select value={modelType} onChange={(e) => setModelType(e.target.value)}>
-              <option value="llm">Language Model (LLM)</option>
-              <option value="cv">Computer Vision</option>
-              <option value="nlp">Natural Language Processing</option>
-            </Select>
-          </FormControl>
-          <FormControl id="modelName">
-            <FormLabel>Model Name</FormLabel>
-            <Input type="text" value={modelName} onChange={(e) => setModelName(e.target.value)} required />
-          </FormControl>
-          <FormControl id="datasetUrl">
-            <FormLabel>Dataset URL</FormLabel>
-            <Input type="url" value={datasetUrl} onChange={(e) => setDatasetUrl(e.target.value)} required />
-          </FormControl>
-          <FormControl id="trainingData">
-            <FormLabel>Training Data</FormLabel>
-            <Textarea value={trainingData} onChange={(e) => setTrainingData(e.target.value)} required />
+          {}
+          <FormControl id="fileUpload">
+            <FormLabel>Upload File (CSV, TXT, JSON, JSONL)</FormLabel>
+            <InputGroup>
+              <InputLeftElement pointerEvents="none">
+                <Icon as={FaFileUpload} color="gray.300" />
+              </InputLeftElement>
+              <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{ display: "none" }} accept=".csv,.txt,.json,.jsonl" />
+              <Button onClick={() => fileInputRef.current.click()}>{uploadedFile ? uploadedFile.name : "Choose File"}</Button>
+            </InputGroup>
+            {uploadedFile && (
+              <Text fontSize="sm" marginTop={2}>
+                {uploadedFile.name}
+              </Text>
+            )}
           </FormControl>
           <Button type="submit" colorScheme="blue" isLoading={isTraining}>
             {isTraining ? <Spinner size="sm" /> : "Train Model"}
